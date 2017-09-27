@@ -1,0 +1,317 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <title>WebGL 3D Model Viewer</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="three.js"></script>
+    <script src="Detector.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="OBJLoader.js"></script>
+    <script src="MTLLoader.js"></script>
+    <script type="text/javascript" src="dat_gui/dat.gui.min.js"></script>
+
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            background: hsl(0, 0%, 10%);
+        }
+
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .left,
+        .right {
+            position: absolute;
+            color: #fff;
+            font-family: Geneva, sans-serif;
+        }
+
+        .left {
+            bottom: 1em;
+            left: 1em;
+            text-align: left;
+        }
+
+        .right {
+            top: 0;
+            right: 0;
+            text-align: right;
+        }
+
+        a {
+            color: #f58231;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="left">
+        <p>3D Model Viewer<p>
+        <p><a href="http://haopan.github.io/d3viewer/" target="">haopan</a></p>
+    </div>
+
+    <!-- <a class="right" href="https://github.com/Lorti/webgl-3d-model-viewer-using-three.js" target="_top">
+        <img src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67">
+    </a> -->
+
+    <script>
+
+        if (!Detector.webgl) {
+            Detector.addGetWebGLMessage();
+        }
+
+        var container;
+
+        var camera, controls, scene, renderer;
+        var lighting, ambient, keyLight, fillLight, backLight;
+
+        var windowHalfX = window.innerWidth / 2;
+        var windowHalfY = window.innerHeight / 2;
+
+        init();
+        animate();
+
+        function init() {
+
+            container = document.createElement('div');
+            document.body.appendChild(container);
+
+            /* Camera */
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
+            camera.position.z = 3;
+
+            /* Scene */
+
+            scene = new THREE.Scene();
+            lighting = true;
+
+            ambient = new THREE.AmbientLight(0xffffff, 1.0);
+            scene.add(ambient);
+
+            keyLight = new THREE.DirectionalLight(new THREE.Color('hsl(30, 100%, 75%)'), 1.0);
+            keyLight.position.set(-100, 0, 100);
+            scene.add(keyLight);
+
+            fillLight = new THREE.DirectionalLight(new THREE.Color('hsl(240, 100%, 75%)'), 0.75);
+            fillLight.position.set(100, 0, 100);
+            scene.add(fillLight);
+
+            backLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            backLight.position.set(100, 0, -100).normalize();
+            scene.add(backLight);
+
+            /* Models */
+
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setPath('assets/');
+            var file_list = ['bathtube.obj', 'fertility.obj', 'half_sphere.obj'];
+            for(let file of file_list){
+                objLoader.load(file, function (object) {
+                    scene.add(object);
+
+                    var bbox = new THREE.Box3().setFromObject(object);
+                    var center = bbox.center().negate();
+                    //alert("x,y,z:"+center.x+","+center.y+","+center.z);
+                    var size = 3.0 / (bbox.size().x + bbox.size().y + bbox.size().z);
+                    //alert("size scaling: " + size);
+
+                    object.matrixAutoUpdate = false;
+                    var mat4 = new THREE.Matrix4();
+                    var obj_matrix = object.matrix;
+                    obj_matrix.identity();  // reset
+                    obj_matrix.multiply(mat4.makeScale(size,size,size));
+                    obj_matrix.multiply(mat4.makeTranslation(center.x, center.y, center.z));
+                    
+                });
+            }
+            
+
+            /* Renderer */
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(new THREE.Color("hsl(0, 0%, 10%)"));
+
+            container.appendChild(renderer.domElement);
+
+            /* Controls */
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.enableZoom = true;
+
+            /* Events */
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('keydown', onKeyboardEvent, false);
+
+
+            //GUI
+            var gui_menu = {
+                model: "",
+                harmonic_field: true,
+                bend3d_field: true,
+
+                //message: 'Hello World',
+                //displayOutline: true,
+                //maxSize: 6.0,
+                //speed: 5,
+                //height: 10,
+                //noiseStrength: 10.2,
+                //growthSpeed: 0.2,
+                //type: 'three',
+
+                //explode: function () {
+                //    alert('Bang!');
+                //},
+
+                //color0: "#ffae23", // CSS string
+                //color1: [0, 128, 255], // RGB array
+                //color2: [0, 128, 255, 0.3], // RGB with alpha
+                //color3: { h: 350, s: 0.9, v: 0.3 } // Hue, saturation, value
+            };
+
+            var gui = new dat.gui.GUI();
+
+            //gui.remember(obj);
+
+            gui.add(gui_menu, "model", ['bathtube', 'fertility', 'half_sphere']).onChange(
+                function () {
+                    
+                    scene.traverse(function (child) {
+                            if (child instanceof THREE.Mesh
+                                || child instanceof THREE.LineSegments) {
+                                if (child.name.indexOf(gui_menu.model)!=-1)
+                                {
+                                    child.material.visible = true;
+                                    //reset roi.
+                                    //camera.lookAt(child.getWorldPosition());
+                                }
+                                else
+                                    child.material.visible = false;
+                            }
+                        }
+                    )
+                }
+                );
+            gui.add(gui_menu, "harmonic_field").onChange(
+                function () {
+                    scene.traverse(function (child) {
+                        if (child.name.indexOf("line_harmonic") != -1
+                            && child.name.indexOf(gui_menu.model)!=-1
+                            ) {
+                                child.material.visible = gui_menu.harmonic_field;
+                        }
+                    }
+                    )
+                }
+                );
+            gui.add(gui_menu, "bend3d_field").onChange(
+                function () {
+                    scene.traverse(function (child) {
+                        if (child.name.indexOf("line_bendfield")!=-1
+                            && child.name.indexOf(gui_menu.model) != -1
+                            ) {
+                            child.material.visible = gui_menu.bend3d_field;
+                        }
+                    }
+                    )
+                }
+                );
+
+            //gui.add(obj, 'message');
+            //gui.add(obj, 'displayOutline');
+            //gui.add(obj, 'explode');
+            //gui.add(obj, 'maxSize').min(-10).max(10).step(0.25);
+            //gui.add(obj, 'height').step(5); // Increment amount
+
+            //// Choose from accepted values
+            //gui.add(obj, 'type', ['one', 'two', 'three']);
+
+            //// Choose from named values
+            //gui.add(obj, 'speed', { Stopped: 0, Slow: 0.1, Fast: 5 });
+
+            //var f1 = gui.addFolder('Colors');
+            //f1.addColor(obj, 'color0');
+            //f1.addColor(obj, 'color1');
+            //f1.addColor(obj, 'color2');
+            //f1.addColor(obj, 'color3');
+
+            //var f2 = gui.addFolder('Another Folder');
+            //f2.add(obj, 'noiseStrength');
+
+            //var f3 = f2.addFolder('Nested Folder');
+            //f3.add(obj, 'growthSpeed');
+
+        }
+
+        function onWindowResize() {
+
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        function onKeyboardEvent(e) {
+
+            if (e.code === 'KeyL') {
+
+                lighting = !lighting;
+
+                if (lighting) {
+
+                    ambient.intensity = 0.25;
+                    scene.add(keyLight);
+                    scene.add(fillLight);
+                    scene.add(backLight);
+
+                } else {
+
+                    ambient.intensity = 1.0;
+                    scene.remove(keyLight);
+                    scene.remove(fillLight);
+                    scene.remove(backLight);
+
+                }
+
+            }
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            controls.update();
+
+            render();
+
+        }
+
+        function render() {
+
+            renderer.render(scene, camera);
+
+        }
+
+    </script>
+
+</body>
+</html>
