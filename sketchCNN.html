@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- TemplateBeginEditable name="doctitle" -->
+    <title>Robust Flow-Guided Neural Prediction for Sketch-Based Freeform Surface Modeling</title>
+    <!-- TemplateEndEditable -->
+    <!-- TemplateBeginEditable name="head" -->
+    <!-- TemplateEndEditable -->
+    
+    <style type="text/css">
+        
+        body {
+            font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+            background-color: #42413C;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background-attachment: fixed;
+            font-size: 17px;
+        }
+
+        /* ~~ Element/tag selectors ~~ */
+        ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+            padding: 0;
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p {
+            margin-top: 0; /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
+            padding-right: 15px;
+            padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
+            font-size: 130%;
+            text-align: justify;
+        }
+
+        a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+            border: none;
+        }
+
+        /* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+        a:link {
+            color: #42413C; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        a:visited {
+            color: #6E6C64;
+        }
+
+        a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+            text-decoration: none;
+        }
+
+        /* ~~ this fixed width container surrounds all other divs~~ */
+        .container {
+            width: 1000px;
+            background-color: #FFF;
+            margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout */
+            overflow: hidden; /* this declaration makes the .container understand where the floated columns within ends and contain them */
+        }
+
+        /* ~~ These are the columns for the layout. ~~
+
+        1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+
+        2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
+
+        3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
+
+        4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
+
+        */
+        .sidebar1 {
+            float: left;
+            width: 180px;
+            height: 800px;
+            background-color: #EADCAE;
+            padding-bottom: 10px;
+        }
+
+        .content {
+            padding: 10px 0px 10px 0px;
+            width: 1000px;
+            float: center;
+            text-align: center;
+        }
+
+        .sidebar2 {
+            float: left;
+            width: 180px;
+            background-color: #EADCAE;
+            padding: 10px 0;
+        }
+
+        /* ~~ This grouped selector gives the lists in the .content area space ~~ */
+        .content ul, .content ol {
+            padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
+        }
+
+        /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
+        ul.nav {
+            list-style: none; /* this removes the list marker */
+            border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
+            margin-bottom: 15px; /* this creates the space between the navigation on the content below */
+        }
+
+            ul.nav li {
+                border-bottom: 1px solid #666; /* this creates the button separation */
+            }
+
+            ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
+                padding: 5px 5px 5px 15px;
+                display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
+                width: 160px; /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
+                text-decoration: none;
+                background-color: #C6D580;
+            }
+
+                ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background and text color for both mouse and keyboard navigators */
+                    background-color: #ADB96E;
+                    color: #FFF;
+                }
+
+        /* ~~ miscellaneous float/clear classes ~~ */
+        .fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+            float: right;
+            margin-left: 8px;
+        }
+
+        .fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+            float: left;
+            margin-right: 8px;
+        }
+
+        .clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the overflow:hidden on the .container is removed */
+            clear: both;
+            height: 0;
+            font-size: 1px;
+            line-height: 0px;
+        }
+
+        .container .content .content {
+            font-size: 100%;
+            text-align: center;
+        }
+        
+    </style>
+    
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="content">
+            <table width="80%" align="center" cellspacing="10">
+                <tr>
+                    <td align="center" style="font-size:120%"><strong>Robust Flow-Guided Neural Prediction for Sketch-Based <br/>Freeform Surface Modeling</strong></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><a href="http://i.cs.hku.hk/~cjli/" style="text-decoration:none;">Changjian Li</a><font size="2"><sup>1,2</sup></font>, <a href="http://haopan.github.io/" style="text-decoration:none;">Hao Pan</a><font size="2"><sup>2</sup></font>, <a href="https://xueyuhanlang.github.io/" style="text-decoration:none;">Yang Liu</a><font size="2"><sup>2</sup></font>, <a href="https://www.microsoft.com/en-us/research/people/xtong/" style="text-decoration:none;">Xin Tong</a><font size="2"><sup>2</sup></font>, <a href="http://www.cs.ubc.ca/~sheffa/" style="text-decoration:none;">Alla Sheffer</a><font size="2"><sup>3</sup></font>, <a href="http://i.cs.hku.hk/~wenping/" style="text-decoration:none;">Wenping Wang</a><font size="2"><sup>1</sup></font></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><font size="2"><sup>1</sup></font>The University of Hong Kong, <font size="2"><sup>2</sup></font>Microsoft Research Asia, <font size="2"><sup>3</sup></font>University of British Columbia</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">ACM Transactions on Graphics (Proceedings of SIGGRAPH Asia 2018)</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:100%">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center"><img src="images/sketchcnn_teaser.jpg" width="100%" alt="Paper teaser" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Five freeform shapes created by our sketch-based modeling approach, with the corresponding planar sketches. 
+                        The shapes are sketched in two views for the bear, kitty, human body and gecko models, and in three views for different parts of the fish model.
+                        The sketches are gray scale images; strokes marked in red have been re-sketched in rotated views to bend the bear limbs or fish body.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Abstract</strong></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                    Sketching provides an intuitive user interface for communicating free form shapes. 
+                    While human observers can easily envision the shapes they intend to communicate, replicating this process algorithmically requires resolving numerous ambiguities.   
+                    Existing sketch-based modeling methods resolve these ambiguities by either relying on expensive
+                    user annotations or by restricting the modeled shapes to specific narrow categories. 
+                    We present an approach for modeling generic freeform 3D surfaces from sparse, expressive 2D sketches that overcomes both limitations by incorporating convolution neural networks (CNN) into the sketch processing workflow. 
+                    <br/><br />
+                    Given a 2D sketch of a 3D surface, we use CNNs to infer the depth and normal maps representing the surface. 
+                    To combat ambiguity we introduce an intermediate CNN layer that models the dense curvature direction, or flow, field of the surface, and produce an additional output confidence map along with depth and normal. The flow field guides our subsequent surface reconstruction for improved regularity;
+                    the confidence map trained unsupervised measures ambiguity and provides a robust estimator for data fitting.
+                    To reduce ambiguities in input sketches users can refine their input by providing optional depth values at sparse points and curvature hints for strokes. 
+                    Our CNN is trained on a large dataset generated by rendering sketches of various 3D shapes using non-photo-realistic line rendering (NPR) method that mimics human sketching of free-form shapes. 
+                    We use the CNN model to process both single- and multi-view sketches. 
+                    Using our multi-view framework users progressively complete the shape by sketching in different views, generating complete closed shapes. For each new view, the modeling is assisted by partial sketches and depth cues provided by surfaces generated in earlier views. The partial surfaces are fused into a complete shape using predicted confidence levels as weights. 
+                    <br/><br />
+                    We validate our approach, compare it with previous methods and alternative structures, and evaluate its performance with various modeling tasks. The results demonstrate our method is a new approach for efficiently modeling freeform shapes with succinct but expressive 2D sketches.
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td align="left" style="font-size:110%"><strong>Paper and data</strong></td>
+                </tr>-->
+                <tr align="left">
+                    <td>
+                        <table>
+                            <tr>
+                                <td><img src="images/sketchcnn_paper_thumbnail.jpg" width="190" /></td>
+                                <td>&nbsp;</td>
+                                <td style="font-size:75%">
+                                    <strong>Paper</strong> [<a href="papers/sketchCNN.pdf">PDF</a>] <br/><br />
+                                    <strong>Code and data</strong>  Coming soon. <br /><br />
+                                    <strong>Supplemental doc</strong> [<a href="data/SketchCNN_supplemental.zip">ZIP</a>] <br /><br />
+                                    <strong>Citation</strong><br/>
+                                    Changjian Li, Hao Pan, Yang Liu, Xin Tong, Alla Sheffer, and Wenping Wang.
+                                    2018. Robust Flow-Guided Neural Prediction for Sketch-Based Freeform Surface Modeling. ACM
+                                    Trans. Graph. 37, 6, Article 238 (November 2018), 12 pages.
+                                    DOI: https://doi.org/10.1145/3272127.3275051 <br/>
+                                    <a href="sketchcnn_bibtex.bib">(bibtex)</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Algorithm pipeline</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/sketchcnn_pipeline.jpg" width="105%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Sketching in front and back views to model a complete bird model. 
+                        In each view, the input contains gray scale sketches drawn by the user and additional data including sketch mask and optional sparse depth sample points or curvature hints.
+                        The first part (DFNet) of the two-stage CNN for surface prediction takes the input data and regresses a dense flow field that characterizes the curvature directions of the final surface. 
+                        Then the input data is combined with the dense flow field to go through the second stage (GeomNet) to produce the surface patch represented as depth and normal maps, together with a confidence map that measures how much ambiguity there is for each predicted pixel.
+                        Back view sketching borrows contour depth from the front view, and goes through the same two-stage CNN to produce the back patch.
+                        The two surface patches are finally combined and fused into the complete 3D shape.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Results</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/sketchcnn_user_editing.jpg" width="65%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Sketching different stars in a sequence.
+                        From left to right: contour only, inner strokes are drawn, inner strokes are given negative curvature hints, inner strokes are given sharp feature hints, and finally a depth sample (red point) is put at the center to push down the shape.
+                    </td>
+                </tr>
+                <tr>
+                    <td><img src="images/sketchcnn_gallery.jpg" width="100%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        More sketches and corresponding shapes. Red contours are re-sketched to provide additional boundary depth data. Inner depth samples (red points) are used for the torso back and owl face. Sharp features (purple) are used in pyramid, penguin, owl face. Curvature hints are used for ice cream. Dolphin fin, duck wing, and owl nose are modeled by small triangle patches in their own views and then fused with the other parts. Penguin and pyramid are single patches; the rest are complete shapes.
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Video</b><br/><br />
+                        <iframe width="640" height="360" src="https://www.youtube.com/embed/Fz-f-e51zRQ" frameborder="0" allowfullscreen=allowfullscreen></iframe>
+                        <!--<iframe width="560" height="315" src="https://youtu.be/vPkt55wNZhg" frameborder="1" style="border:3px solid #666CCC" allowfullscreen=allowfullscreen></iframe>-->
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:80%">&copy;Hao Pan. Last update: Sep 18, 2018.</td>
+                </tr>
+            </table>
+        </div>
+        <!-- end .container -->
+    </div>
+</body>
+</html>
