@@ -1,0 +1,322 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- TemplateBeginEditable name="doctitle" -->
+    <title>Repairing Man-Made Meshes via Visual Driven Global Optimization with Minimum Intrusion</title>
+    <!-- TemplateEndEditable -->
+    <!-- TemplateBeginEditable name="head" -->
+    <!-- TemplateEndEditable -->
+    
+    <style type="text/css">
+        
+        body {
+            font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+            background-color: #42413C;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background-attachment: fixed;
+            font-size: 17px;
+        }
+
+        /* ~~ Element/tag selectors ~~ */
+        ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+            padding: 0;
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p {
+            margin-top: 0; /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
+            padding-right: 15px;
+            padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
+            font-size: 130%;
+            text-align: justify;
+        }
+
+        a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+            border: none;
+        }
+
+        /* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+        a:link {
+            color: #42413C; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        a:visited {
+            color: #6E6C64;
+        }
+
+        a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+            text-decoration: none;
+        }
+
+        /* ~~ this fixed width container surrounds all other divs~~ */
+        .container {
+            width: 1000px;
+            background-color: #FFF;
+            margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout */
+            overflow: hidden; /* this declaration makes the .container understand where the floated columns within ends and contain them */
+        }
+
+        /* ~~ These are the columns for the layout. ~~
+
+        1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+
+        2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
+
+        3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
+
+        4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
+
+        */
+        .sidebar1 {
+            float: left;
+            width: 180px;
+            height: 800px;
+            background-color: #EADCAE;
+            padding-bottom: 10px;
+        }
+
+        .content {
+            padding: 10px 0px 10px 0px;
+            width: 1000px;
+            float: center;
+            text-align: center;
+        }
+
+        .sidebar2 {
+            float: left;
+            width: 180px;
+            background-color: #EADCAE;
+            padding: 10px 0;
+        }
+
+        /* ~~ This grouped selector gives the lists in the .content area space ~~ */
+        .content ul, .content ol {
+            padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
+        }
+
+        /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
+        ul.nav {
+            list-style: none; /* this removes the list marker */
+            border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
+            margin-bottom: 15px; /* this creates the space between the navigation on the content below */
+        }
+
+            ul.nav li {
+                border-bottom: 1px solid #666; /* this creates the button separation */
+            }
+
+            ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
+                padding: 5px 5px 5px 15px;
+                display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
+                width: 160px; /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
+                text-decoration: none;
+                background-color: #C6D580;
+            }
+
+                ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background and text color for both mouse and keyboard navigators */
+                    background-color: #ADB96E;
+                    color: #FFF;
+                }
+
+        /* ~~ miscellaneous float/clear classes ~~ */
+        .fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+            float: right;
+            margin-left: 8px;
+        }
+
+        .fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+            float: left;
+            margin-right: 8px;
+        }
+
+        .clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the overflow:hidden on the .container is removed */
+            clear: both;
+            height: 0;
+            font-size: 1px;
+            line-height: 0px;
+        }
+
+        .container .content .content {
+            font-size: 100%;
+            text-align: center;
+        }
+        
+    </style>
+    
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="content">
+            <table width="80%" align="center" cellspacing="10">
+                <tr>
+                    <td align="center" style="font-size:120%"><strong>Repairing Man-Made Meshes via Visual Driven Global Optimization with Minimum Intrusion</strong></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><a href="http://i.cs.hku.hk/~lchu/" style="text-decoration:none;">Chu Lei</a><font size="2"><sup>1,2</sup></font>, <a href="http://haopan.github.io/" style="text-decoration:none;">Hao Pan</a><font size="2"><sup>2</sup></font>, <a href="https://xueyuhanlang.github.io/" style="text-decoration:none;">Yang Liu</a><font size="2"><sup>2</sup></font>, <a href="http://i.cs.hku.hk/~wenping/" style="text-decoration:none;">Wenping Wang</a><font size="2"><sup>1</sup></font></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><font size="2"><sup>1</sup></font>The University of Hong Kong, <font size="2"><sup>2</sup></font>Microsoft Research Asia</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">ACM Transactions on Graphics (Proceedings of SIGGRAPH Asia 2019)</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:100%">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center"><img src="images/meshrepair_teaser.jpg" width="100%" alt="Paper teaser" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Meshes from ModelNet [Wu et al. 2015] and ShapeNet [Chang et al. 2015] are repaired by our tool that produces large coherent manifold meshes
+                        preserving the input visual appearances and features. Each manifold surface patch is colored differently. From top to bottom: the input meshes with scattered and redundant patches, our results with meaningful components and the more concise results when hidden patches are removed (Sec. 6.2). The shell of the car model is rendered in transparency to show inner structures.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Abstract</strong></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                    3D mesh models created by human users and shared through online platforms and datasets flourish recently. While the creators generally have spent
+                    large efforts in modeling the visually appealing shapes with both large scale structures and intricate details, a majority of the meshes are unfortunately flawed in terms of having duplicate faces, mis-oriented regions, disconnected patches, etc. , due to multiple factors involving both human errors and software inconsistencies. All these artifacts have severely limited the possible low-level and high-level processing tasks that can be applied to the rich datasets. In this work, we present a novel approach to fix these man-made meshes such that the outputs are guaranteed to be oriented manifold meshes that preserve the original structures, big and small, as much as possible. Our key observation is that the models all visually look meaningful, which leads to our strategy of repairing the flaws while always preserving the visual quality. We apply local refinements and removals only where necessary to achieve minimal intrusion of the original meshes, and global adjustments through robust optimization to ensure the outputs are valid manifold meshes with optimal connections. We test the approach on large-scale 3D datasets, and obtain quality meshes that are more readily usable for further geometry processing tasks. 
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td align="left" style="font-size:110%"><strong>Paper and data</strong></td>
+                </tr>-->
+                <tr align="left">
+                    <td>
+                        <table>
+                            <tr>
+                                <td><a href="papers/MeshRepair.pdf"><img src="images/meshrepair_paper_thumbnail.jpg" width="190" /></a></td>
+                                <td>&nbsp;</td>
+                                <td style="font-size:75%">
+                                    <strong>Paper</strong> [<a href="papers/MeshRepair.pdf">PDF</a>] <br/><br />
+                                    <strong>Code and data</strong> [<a href="https://github.com/lei65537/Visual_Driven_Mesh_Repair">Link</a>] <br /><br />
+                                    <strong>Supplemental doc</strong> [<a href="data/MeshRepair_supplemental.zip">ZIP</a>] <br /><br />
+                                    <strong>Citation</strong><br/>
+                                    Lei Chu, Hao Pan, Yang Liu, and Wenping Wang.
+                                    2019. Repairing Man-Made Meshes via Visual Driven Global Optimization with Minimum Intrusion. ACM
+                                    Trans. Graph. 38, 6, Article 158 (November 2019), 18 pages. https://doi.org/10.1145/3355089.3356507<br/>
+                                    <a href="meshrepair_bibtex.bib">(bibtex)</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Algorithm pipeline</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/meshrepair_2d_illus.jpg" width="60%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        2D illustration of the repair pipeline. (a) depicts the input mesh whose faces are shown as line segments, with shadow showing backside of a face.
+                        The input mesh has flipped faces, redundant faces and self intersections. (b) shows the cleaned and reoriented face patches after the visual processing step (Sec. 4). (c) shows how the patches are further connected into large and coherent pieces by the manifold mesh reconstruction step (Sec. 5).
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><img src="images/meshrepair_3d_pipeline.jpg" width="100%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        The visual driven global mesh repair pipeline applied on a bag model from ShapeNet. From left to right: (a) the input mesh, with its scattered manifold surface patches (Sec. 4.1) rendered in different colors; (b) after preprocessing that merges coinciding vertices and removes duplicate faces (Sec. 3); (c) after visual-driven processing (Sec. 4) that further reorients and merges scattered patches and removes visually redundant patches shown in (c&#772;); (d) after the global optimization of patch orientation and connection (Sec. 5), intersecting patches (e.g. around the rings) are connected into coherent and larger pieces; (e) the global optimization applied on the subset of patches excluding hidden ones shown in (e&#772;), to enable more connections of different components (Sec. 6.2); (f) is (e) rendered with textures copied from the initial input, which are well preserved by our minimally intrusive approach. The number of manifold surface patches PN is shown for each mesh. For (a) and (b), we have used two-sided shading so that their many flipped faces can be shown.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Results</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/meshrepair_mobius.jpg" width="60%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        An unorientable Möbius strip. From left to right: (a) the input Möbius strip with faces randomly flipped (front in blue, back in purple), (b) result after visual processing that tries to reorient the faces into larger patches with coherent orientations, and (c) result after global manifold mesh reconstruction which further flips certain small patches to obtain a single oriented surface with a boundary curve separating the opposite facing triangles.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/meshrepair_double_cube.jpg" width="70%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Double cubes touching at a common edge, as shown in (a). Under our energy formulation, there are two equally optimal manifold solutions, (b) and (c). We slightly translated the two separate cubes in (b), and perturbed the geometrically coinciding vertices in (c) to better visualize the topology. (d) is a transparent rendering of (c) to show the connections clearly. Note that the one-edge singular curve in (a) is split by our post-processing (Sec. 6.1).
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/meshrepair_result_gallery.jpg" width="100%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        More results by processing ModelNet and ShapeNet datasets. The left side shows results without hidden patch removal, and the right side more concise models with hidden patch removal.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Sample applications</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/meshrepair_app_remesh.jpg" width="65%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Remeshing on the repaired models. For each pair, the left is the input model, and the right is our fixed model with each patch further remeshed by local operations like edge flipping and vertex smoothing [Fu et al. 2014]. Hidden patches are not removed here. Note that sharp curves on the input models are detected as feature lines and well preserved by remeshing.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/meshrepair_app_texturing.jpg" width="65%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Texturing the repaired meshes. Top row shows the repaired meshes that have large manifold components with all sorts of delicate structures preserved. Bottom row are the rendered meshes with textures copied from input meshes. Note how the textures are well transferred. The left two meshes are results with hidden pieces removed, and the right one without.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Solver comparison</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/meshrepair_solver_comparison.jpg" width="85%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Result manifold components by different solvers without hidden patch removal. The input of each test case is shown at upper left corner. The components are rearranged manually to better show the structures. Both BnB and our results are structurally regular and similar, while greedy solver results are more scattered.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+<!--            <tr>
+                    <td align="left"><b>Video</b><br/><br />
+                        <iframe width="640" height="360" src="" frameborder="0" allowfullscreen=allowfullscreen></iframe>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:80%">&copy;Hao Pan. Last update: Sep 2, 2019.</td>
+                </tr>
+            </table>
+        </div>
+        <!-- end .container -->
+    </div>
+</body>
+</html>
