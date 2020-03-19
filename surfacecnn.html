@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- TemplateBeginEditable name="doctitle" -->
+    <title>PFCNN: Convolutional Neural Networks on 3D Surfaces Using Parallel Frames</title>
+    <!-- TemplateEndEditable -->
+    <!-- TemplateBeginEditable name="head" -->
+    <!-- TemplateEndEditable -->
+    
+    <style type="text/css">
+        
+        body {
+            font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+            background-color: #42413C;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background-attachment: fixed;
+            font-size: 17px;
+        }
+
+        /* ~~ Element/tag selectors ~~ */
+        ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+            padding: 0;
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p {
+            margin-top: 0; /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
+            padding-right: 15px;
+            padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
+            font-size: 130%;
+            text-align: justify;
+        }
+
+        a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+            border: none;
+        }
+
+        /* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+        a:link {
+            color: #42413C; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        a:visited {
+            color: #6E6C64;
+        }
+
+        a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+            text-decoration: none;
+        }
+
+        /* ~~ this fixed width container surrounds all other divs~~ */
+        .container {
+            width: 1000px;
+            background-color: #FFF;
+            margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout */
+            overflow: hidden; /* this declaration makes the .container understand where the floated columns within ends and contain them */
+        }
+
+        /* ~~ These are the columns for the layout. ~~
+
+        1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+
+        2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
+
+        3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
+
+        4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
+
+        */
+        .sidebar1 {
+            float: left;
+            width: 180px;
+            height: 800px;
+            background-color: #EADCAE;
+            padding-bottom: 10px;
+        }
+
+        .content {
+            padding: 10px 0px 10px 0px;
+            width: 1000px;
+            float: center;
+            text-align: center;
+        }
+
+        .sidebar2 {
+            float: left;
+            width: 180px;
+            background-color: #EADCAE;
+            padding: 10px 0;
+        }
+
+        /* ~~ This grouped selector gives the lists in the .content area space ~~ */
+        .content ul, .content ol {
+            padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
+        }
+
+        /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
+        ul.nav {
+            list-style: none; /* this removes the list marker */
+            border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
+            margin-bottom: 15px; /* this creates the space between the navigation on the content below */
+        }
+
+            ul.nav li {
+                border-bottom: 1px solid #666; /* this creates the button separation */
+            }
+
+            ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
+                padding: 5px 5px 5px 15px;
+                display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
+                width: 160px; /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
+                text-decoration: none;
+                background-color: #C6D580;
+            }
+
+                ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background and text color for both mouse and keyboard navigators */
+                    background-color: #ADB96E;
+                    color: #FFF;
+                }
+
+        /* ~~ miscellaneous float/clear classes ~~ */
+        .fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+            float: right;
+            margin-left: 8px;
+        }
+
+        .fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+            float: left;
+            margin-right: 8px;
+        }
+
+        .clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the overflow:hidden on the .container is removed */
+            clear: both;
+            height: 0;
+            font-size: 1px;
+            line-height: 0px;
+        }
+
+        .container .content .content {
+            font-size: 100%;
+            text-align: center;
+        }
+        
+    </style>
+    
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="content">
+            <table width="80%" align="center" cellspacing="10">
+                <tr>
+                    <td align="center" style="font-size:120%"><strong>PFCNN: Convolutional Neural Networks on 3D Surfaces Using Parallel Frames</strong></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">
+					<a href="" style="text-decoration:none;">Yuqi Yang</a><font size="2"><sup>1,3</sup></font>, 
+					<a href="" style="text-decoration:none;">Shilin Liu</a><font size="2"><sup>2,3</sup></font>, 
+					<a href="http://haopan.github.io/" style="text-decoration:none;">Hao Pan</a><font size="2"><sup>3</sup></font>, 
+					<a href="https://xueyuhanlang.github.io/" style="text-decoration:none;">Yang Liu</a><font size="2"><sup>3</sup></font>, 
+					<a href="https://www.microsoft.com/en-us/research/people/xtong/" style="text-decoration:none;">Xin Tong</a><font size="2"><sup>3</sup></font>
+					</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">
+					<font size="2"><sup>1</sup></font>Tsinghua University, 
+					<font size="2"><sup>2</sup></font>University of Science and Technology of China, 
+					<font size="2"><sup>3</sup></font>Microsoft Research Asia</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">The IEEE Conference on Computer Vision and Pattern Recognition (CVPR) 2020</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:100%">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Abstract</strong></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                    Surface meshes are widely used shape representations and capture finer geometry data than point clouds or volumetric grids, but are challenging to apply CNNs directly due to their non-Euclidean structure. We use parallel frames on surface to define PFCNNs that enable effective feature learning on surface meshes by mimicking standard convolutions faithfully. In particular, the convolution of PFCNN not only maps local surface patches onto flat tangent planes, but also aligns the tangent planes such that they locally form a flat Euclidean structure, thus enabling recovery of standard convolutions. The alignment is achieved by the tool of locally flat connections borrowed from discrete differential geometry, which can be efficiently encoded and computed by parallel frame fields. In addition, the lack of canonical axis on surface is handled by sampling with the frame directions. Experiments show that for tasks including classification, segmentation and registration on deformable geometric domains, as well as semantic scene segmentation on rigid domains, PFCNNs achieve robust and superior performances without using sophisticated input features than state-of-the-art surface based CNNs. 
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td align="left" style="font-size:110%"><strong>Paper and data</strong></td>
+                </tr>-->
+                <tr align="left">
+                    <td>
+                        <table>
+                            <tr>
+                                <td><a href="papers/surfacecnn.pdf"><img src="images/surfacecnn_paper_thumbnail.jpg" width="190" /></a></td>
+                                <td>&nbsp;</td>
+                                <td style="font-size:75%">
+                                    <strong>Paper</strong> [<a href="papers/surfacecnn.pdf">PDF</a>] <br/><br />
+                                    <strong>Code and data</strong> [<a href="https://github.com/msraig/pfcnn">Link</a>] <br /><br />
+                                    <strong>Citation</strong><br/>
+                                    Yuqi Yang, Shilin Liu, Hao Pan, Yang Liu, and Xin Tong.
+                                    PFCNN: Convolutional Neural Networks on 3D Surfaces Using Parallel Frames. In Proceedings of the IEEE conference on computer vision and pattern recognition, 2020.<br/>
+                                    <a href="surfacecnn_bibtex.bib">(bibtex)</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Method</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/surfacecnn_connections.png" width="60%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        For patch-based surface CNNs, the key problem is how to align the tangent spaces of different surface points. Left: the parallel transport is path-dependent and maps the vector in TxM directly to the blue one in TzM but to the red dashed one by going through TyM. Right: by building a flat connection encoded by the parallel 4-direction frame field, our approach has path-independent translation as in image domain.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><img src="images/surfacecnn_cover_space.png" width="80%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        4-direction frame fields and the corresponding cover spaces. (a)&(b): a field without singular vertex and the four separate sheets of the cover space. (c)&(d): a field with a singular vertex on the cube-corner shaped surface and the four sheets of cover space that are connected and coincide at the singular vertex.
+						We use the cover space to organize the feature maps: on each sheet of the cover space, the vector field defines canonical reference frames, and a feature map is defined and convoluted with the trainable kernels that are aligned by the reference frames.
+						Different sheets of the cover space share the trainable kernels.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+				<tr>
+                    <td><img src="images/surfacecnn_unet_structure.png" width="70%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        A U-Net structure built with our PFCNN framework used for the human body segmentation task. Our surface convolution fully supports various CNN structures like ResNet and U-Net. The feature maps for different cover space branches are in parallel and finally reduced into one map before output. In this figure, N is the number of branches (or frame axes).
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Results</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/surfacecnn_seg_result_zoomin.png" width="70%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Visualization of human body segmentation results. From top to bottom: the ground truth labeling, the results by MDGCNN, and our results. We can see that our results are more accurate and consistent.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/surfacecnn_regression_result_zoomin.png" width="70%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Visualization of human body registration results through texture mapping. From top to bottom: the ground truth registration, the results by MDGCNN, and our results. On these incomplete FAUST scan meshes with diverse genus, our results show higher accuracy and robustness.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/surfacecnn_scannet_results.jpg" width="100%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Scannet scene segmentation results. From left to right: the ground truth labels with unkonwn regions marked in dark, the results by TextureNet, and our results. Our results have more regular segmentations and predict reasonable labels even for the unkown regions.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+				<tr> <td align="left" style="font-size:80%">Note: An earlier preprint version of the paper was posted at Arxiv <a href="https://arxiv.org/pdf/1808.04952.pdf">https://arxiv.org/pdf/1808.04952.pdf.</a></td> </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:80%">&copy;Hao Pan. Last update: March 19, 2020.</td>
+                </tr>
+            </table>
+        </div>
+        <!-- end .container -->
+    </div>
+</body>
+</html>
