@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- TemplateBeginEditable name="doctitle" -->
+    <title>Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective</title>
+    <!-- TemplateEndEditable -->
+    <!-- TemplateBeginEditable name="head" -->
+    <!-- TemplateEndEditable -->
+    
+    <style type="text/css">
+        
+        body {
+            font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;
+            background-color: #42413C;
+            margin: 0;
+            padding: 0;
+            color: #000;
+            background-attachment: fixed;
+            font-size: 17px;
+        }
+
+        /* ~~ Element/tag selectors ~~ */
+        ul, ol, dl { /* Due to variations between browsers, it's best practices to zero padding and margin on lists. For consistency, you can either specify the amounts you want here, or on the list items (LI, DT, DD) they contain. Remember that what you do here will cascade to the .nav list unless you write a more specific selector. */
+            padding: 0;
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p {
+            margin-top: 0; /* removing the top margin gets around an issue where margins can escape from their containing div. The remaining bottom margin will hold it away from any elements that follow. */
+            padding-right: 15px;
+            padding-left: 15px; /* adding the padding to the sides of the elements within the divs, instead of the divs themselves, gets rid of any box model math. A nested div with side padding can also be used as an alternate method. */
+            font-size: 130%;
+            text-align: justify;
+        }
+
+        a img { /* this selector removes the default blue border displayed in some browsers around an image when it is surrounded by a link */
+            border: none;
+        }
+
+        /* ~~ Styling for your site's links must remain in this order - including the group of selectors that create the hover effect. ~~ */
+        a:link {
+            color: #42413C; /* unless you style your links to look extremely unique, it's best to provide underlines for quick visual identification */
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+        }
+
+        a:visited {
+            color: #6E6C64;
+        }
+
+        a:hover, a:active, a:focus { /* this group of selectors will give a keyboard navigator the same hover experience as the person using a mouse. */
+            text-decoration: none;
+        }
+
+        /* ~~ this fixed width container surrounds all other divs~~ */
+        .container {
+            width: 1000px;
+            background-color: #FFF;
+            margin: 0 auto; /* the auto value on the sides, coupled with the width, centers the layout */
+            overflow: hidden; /* this declaration makes the .container understand where the floated columns within ends and contain them */
+        }
+
+        /* ~~ These are the columns for the layout. ~~
+
+        1) Padding is only placed on the top and/or bottom of the divs. The elements within these divs have padding on their sides. This saves you from any "box model math". Keep in mind, if you add any side padding or border to the div itself, it will be added to the width you define to create the *total* width. You may also choose to remove the padding on the element in the div and place a second div within it with no width and the padding necessary for your design.
+
+        2) No margin has been given to the columns since they are all floated. If you must add margin, avoid placing it on the side you're floating toward (for example: a right margin on a div set to float right). Many times, padding can be used instead. For divs where this rule must be broken, you should add a "display:inline" declaration to the div's rule to tame a bug where some versions of Internet Explorer double the margin.
+
+        3) Since classes can be used multiple times in a document (and an element can also have multiple classes applied), the columns have been assigned class names instead of IDs. For example, two sidebar divs could be stacked if necessary. These can very easily be changed to IDs if that's your preference, as long as you'll only be using them once per document.
+
+        4) If you prefer your nav on the right instead of the left, simply float these columns the opposite direction (all right instead of all left) and they'll render in reverse order. There's no need to move the divs around in the HTML source.
+
+        */
+        .sidebar1 {
+            float: left;
+            width: 180px;
+            height: 800px;
+            background-color: #EADCAE;
+            padding-bottom: 10px;
+        }
+
+        .content {
+            padding: 10px 0px 10px 0px;
+            width: 1000px;
+            float: center;
+            text-align: center;
+        }
+
+        .sidebar2 {
+            float: left;
+            width: 180px;
+            background-color: #EADCAE;
+            padding: 10px 0;
+        }
+
+        /* ~~ This grouped selector gives the lists in the .content area space ~~ */
+        .content ul, .content ol {
+            padding: 0 15px 15px 40px; /* this padding mirrors the right padding in the headings and paragraph rule above. Padding was placed on the bottom for space between other elements on the lists and on the left to create the indention. These may be adjusted as you wish. */
+        }
+
+        /* ~~ The navigation list styles (can be removed if you choose to use a premade flyout menu like Spry) ~~ */
+        ul.nav {
+            list-style: none; /* this removes the list marker */
+            border-top: 1px solid #666; /* this creates the top border for the links - all others are placed using a bottom border on the LI */
+            margin-bottom: 15px; /* this creates the space between the navigation on the content below */
+        }
+
+            ul.nav li {
+                border-bottom: 1px solid #666; /* this creates the button separation */
+            }
+
+            ul.nav a, ul.nav a:visited { /* grouping these selectors makes sure that your links retain their button look even after being visited */
+                padding: 5px 5px 5px 15px;
+                display: block; /* this gives the link block properties causing it to fill the whole LI containing it. This causes the entire area to react to a mouse click. */
+                width: 160px; /*this width makes the entire button clickable for IE6. If you don't need to support IE6, it can be removed. Calculate the proper width by subtracting the padding on this link from the width of your sidebar container. */
+                text-decoration: none;
+                background-color: #C6D580;
+            }
+
+                ul.nav a:hover, ul.nav a:active, ul.nav a:focus { /* this changes the background and text color for both mouse and keyboard navigators */
+                    background-color: #ADB96E;
+                    color: #FFF;
+                }
+
+        /* ~~ miscellaneous float/clear classes ~~ */
+        .fltrt { /* this class can be used to float an element right in your page. The floated element must precede the element it should be next to on the page. */
+            float: right;
+            margin-left: 8px;
+        }
+
+        .fltlft { /* this class can be used to float an element left in your page. The floated element must precede the element it should be next to on the page. */
+            float: left;
+            margin-right: 8px;
+        }
+
+        .clearfloat { /* this class can be placed on a <br /> or empty div as the final element following the last floated div (within the #container) if the overflow:hidden on the .container is removed */
+            clear: both;
+            height: 0;
+            font-size: 1px;
+            line-height: 0px;
+        }
+
+        .container .content .content {
+            font-size: 100%;
+            text-align: center;
+        }
+        
+    </style>
+    
+    <script type="text/javascript" id="MathJax-script" async  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="content">
+            <table width="80%" align="center" cellspacing="10">
+                <tr>
+                    <td align="center" style="font-size:120%"><strong>Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective</strong></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><a href="http://i.cs.hku.hk/~lchu/" style="text-decoration:none;">Chu Lei</a><font size="2"><sup>1,2</sup></font>, <a href="http://haopan.github.io/" style="text-decoration:none;">Hao Pan</a><font size="2"><sup>2</sup></font>, <a href="http://i.cs.hku.hk/~wenping/" style="text-decoration:none;">Wenping Wang</a><font size="2"><sup>3,1</sup></font></td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%"><font size="2"><sup>1</sup></font>The University of Hong Kong, <font size="2"><sup>2</sup></font>Microsoft Research Asia, <font size="2"><sup>3</sup></font>Texas A&amp;M University</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:90%">ACM Transactions on Graphics </td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:100%">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center"><img src="images/ntkdeepprior_teaser.jpg" width="70%" alt="Paper teaser" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Completing partial scans of 3D shapes from different categories with large missing areas, by self-supervised training of sparse 3D CNNs that fit to the partial scans without using extra data set. Each example shows the partial scan (left) and the completed model (right).
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Abstract</strong></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                    We present a novel approach for completing and reconstructing 3D shapes from incomplete scanned data by using deep neural networks. Rather than being trained on supervised completion tasks and applied on a testing shape, the network is optimized from scratch on the single testing shape, to fully adapt to the shape and complete the missing data using contextual guidance from the known regions. The ability to complete missing data by an untrained neural network is usually referred to as the deep prior. In this paper, we interpret the deep prior from a neural tangent kernel (NTK) perspective and show that the completed shape patches by the trained CNN are naturally similar to existing patches, as they are proximate in the kernel feature space induced by NTK. The interpretation allows us to design more efficient network structures and learning mechanisms for the shape completion and reconstruction task. Being more aware of structural regularities than both traditional and other unsupervised learning-based reconstruction methods, our approach completes large missing regions with plausible shapes and complements supervised learning-based methods that use database priors by requiring no extra training data set and showing flexible adaptation to a particular shape instance.
+                    </td>
+                </tr>
+                <!--<tr>
+                    <td align="left" style="font-size:110%"><strong>Paper and data</strong></td>
+                </tr>-->
+                <tr align="left">
+                    <td>
+                        <table>
+                            <tr>
+                                <td><a href="papers/completion.pdf"><img src="images/completion_paper_thumbnail.jpg" width="190" /></a></td>
+                                <td>&nbsp;</td>
+                                <td style="font-size:75%">
+                                    <strong>Paper</strong> [<a href="papers/completion.pdf">PDF</a>] <br/><br />
+                                    <strong>Code and data</strong> [<a href="https://github.com/lei65537/NTKDeepPrior">Link</a>] <br /><br />
+                                    <strong>Supplemental doc</strong> [<a href="data/completion_supplemental.zip">ZIP</a>] <br /><br />
+                                    <strong>Citation</strong><br/>
+                                    Lei Chu, Hao Pan, and Wenping Wang.
+                                    2021. Unsupervised Shape Completion via Deep Prior in the Neural Tangent Kernel Perspective. ACM
+                                    Trans. Graph. <br/>
+                                    <a href="completion_bibtex.bib">(bibtex)</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Algorithm pipeline</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/completion_pipeline.jpg" width="100%" /></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Illustration of the pipeline. Given an incomplete shape in the form of truncated signed distance function (TSDF) (a), we build a dilated sparse volume with initial regions to be completed (b), and fill the sparsity pattern with noise (c) which is then fed to a 3D sparse encoder/decoder CNN (d) to recover a shape (e). The network is optimized to minimize the differences between (e) and (b) for the known shape regions only. The generation domain is updated gradually during the optimization iterations, to maintain the sparsity of the TSDF volume while also ensuring coverage of the missing regions. After sufficient iterations, we obtain the completed shape (f) extracted from the optimized TSDF.
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td><img src="images/completion_pipeline_example.jpg" width="100%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        The evolution of predicted shapes by optimizing the 3D sparse CNN with stochastic gradient descent to fit to the incomplete input shape, where both the known shape and the unknown regions are gradually recovered.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/completion_network.jpg" width="80%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        The three-scale network structure. Each scale \(s\) uses the downsampled noise vector \(z\downarrow_s\) as input and the downsampled target TSDF \(u\downarrow_s\) as supervision, mapped through the base block network \(b_s\) that is a symmetric pair of encoder [\(e_{s,j}\)] and decoder [\(d_{s,j}\)] without skip connections. \(e_{s,j}\) contains a convolution with stride 2 for downsampling followed by another convolution. \(d_{s,j}\) contains nearest neighbor upsampling followed by two convolutions. All convolutions are followed by instance normalization and leaky ReLU activation.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>NTK Analysis</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/completion_kernelpca.jpg" width="60%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Kernel PCA analysis with the NTK, before (left) and after (right) network training. The top three principal component coordinates are used for color coding the spatial points in (a),(b), and the top two principal component coordinates used for 2D plots in (c),(d). Before training, the points are embedded randomly in NTK, but regular patterns emerge with self similarities after training.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Results</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/completion_gallery.jpg" width="80%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        More results of shape completion by our unsupervised method. The diverse objects have been collected from ShapeNet, Thingi10k and Free3D, with challenging features like slim bars, thin layers and large missing regions. Our method plausibly recovers the features by automatically exploiting the self-similarities and overall coherence with known parts.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="left" style="font-size:100%"><strong>Ablation Study</strong></td>
+                </tr>
+                <tr>
+                    <td><img src="images/completion_ablation.jpg" width="100%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Ablation test results on two examples. (c) the full model result is close to the ground truth despite the large missing regions. (d) without multi-scale hierarchy, holes appear at the bunny tail due to difficulty for bridging the large gaps there. (e) without Laplacian smoothness, local regularity is lost and extraneous parts emerge. (f) without augmentation, the completed shapes are less fit and plausible.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/completion_ablation_early_stop.jpg" width="50%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        The average F-score with respect to the number of training epochs, evaluated on 10 validation models and 20 test models, respectively. The shapes quickly recover during the early epochs, reach stable around 2k, but then slowly degrade by fitting to the extra details with more epochs. This demonstrates the necessity of early stopping. 
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td><img src="images/completion_ablation_augmentation.jpg" width="70%"/></td>
+                </tr>
+                <tr>
+                    <td align="justify" style="font-size:75%">
+                        Kernel PCA analysis with NTK for 2k sample points, half from the target models (a),(b) and half from the augmented models (upper right corners of (a),(b)), trained without (left) and with augmentation (right). The scatter plot and color coding are in the same format as above. Without augmentation, the two point sets show no correlation under NTK; with augmentation, the two sets have strong correlations.
+                    </td>
+                </tr>
+                <tr> <td align="center">&nbsp;</td> </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td align="center" style="font-size:80%">&copy;Hao Pan. Last update: April 9, 2021.</td>
+                </tr>
+            </table>
+        </div>
+        <!-- end .container -->
+    </div>
+</body>
+</html>
